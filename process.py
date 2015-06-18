@@ -78,8 +78,7 @@ def writeFile(txt, filename):
 def extractConclusion(filename):
 	if filename is None:
 		return ""
-
-	f = open(os.path.join(REPORTDIR,filename))
+	f = os.path.join(REPORTDIR,filename)
 	document = Document(f)
 	s = []
 	flag = False
@@ -87,11 +86,8 @@ def extractConclusion(filename):
 		cleanedText = unidecode.unidecode(p.text)
 		cleanedText = cleanedText.replace("\n"," ")
 		cleanedText = cleanedText.replace("\t"," ")
-		if (cleanedText.startswith("Conclusion") or cleanedText.startswith("Note") or flag) and (not (cleanedText.startswith("Jonathan") or (cleanedText.startswith("Angela")))):
-			flag = True
-			if len(cleanedText)>0:
-				s.append(cleanedText)
-	f.close()	
+		if (cleanedText.startswith("Conclusion") or cleanedText.startswith("Note")) and (not (cleanedText.startswith("Jonathan") or (cleanedText.startswith("Angela")))):
+			s.append(cleanedText)
 	return "\n".join(s)
 
 def findFiles(filename):

@@ -144,7 +144,7 @@ def conclusionAlgorithm(d):
 
     (C1, C2, C3) = ((LAPTT < 2.5), (DRVVT < 0.95), (DPT < 0.95))
     if (sumConditions(C1,C2,C3)==3)  and Case=="":
-        s.append("This study does not provide sufficient evidence for the identification of a functional lupus anticoagulant.")
+        s.append("This study does not provide evidence for the identification of a functional lupus anticoagulant.")
         Case  = "NEGATIVE"
 
     (C1,C2,C3) = (reduction(d["LAPTT_R"],d["PTTMX_R"], 0.18), reduction(d["DRVVS_R"],d["DRVVMX_R"], 0.18), reduction(d["DPTS_R"],d["DPTMX_R"],0.18))
@@ -161,8 +161,9 @@ def conclusion(d, filename):
 	s.append(conclusionAlgorithm(d))
 	for i in findFiles(filename):
 		concl = extractConclusion(i)
-		concl = concl.replace("Conclusion:","")
-		s.append("\n\nPrevious conclusion (" + i + "): " + str(concl).replace("u'","").replace("'",""))
+		concl = concl.replace("Conclusion:","")		
+		if len(concl)>0:
+			s.append("\n\nPrevious conclusion (" + i + "): " + str(concl))
 	return " ".join(s)
 
 def footer(attending):

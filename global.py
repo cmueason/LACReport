@@ -1,5 +1,5 @@
 #MAC
-windows = True 
+windows = False 
 testing = False
 
 if (not windows):
