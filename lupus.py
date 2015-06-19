@@ -128,7 +128,7 @@ def conclusionAlgorithm(d):
         s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
     
     (C1,C2,C3) = ((LAPTT >= 2.5) and (LAPTT < 3.05), (DRVVT >= 0.095) and (DRVVT < 0.135), (DPT >= 0.095) and (DPT < 0.115))
-    if (sumConditions(C1,C2,C3)>=1)  and (Case == ""):
+    if (sumConditions(C1,C2,C3)>=2)  and (Case == ""):
         Case = "BORDERLINE"
         s.append("The current testing, notably in "+helper(C1,C2,C3)+", reaches only to borderline significance for the identification of a functional lupus anticoagulant. ")
 
