@@ -69,7 +69,9 @@ def MiddleSection(testname, initR, initU, initP, mixR, mixU, mixP, corrR, percen
                 elif reduction(initR, mixR):          s.append(prefix + "shortens dramatically, but still remains prolonged by {:0.1f}".format(mixP) + suffix)
                 elif abs(initR - mixR)<1.0:           s.append(prefix + "is nearly unchanged and remains prolonged by {:0.1f}".format(mixP) + suffix)
 		else:		                      s.append(prefix + "shortens by {:0.1f} seconds, but still remains prolonged by {:0.1f}".format(initR - mixR,mixP) + suffix)
+	else:	s.append("In the mixing phase of the " + testname + " system, the clotting time is normal.")	
 
+	if (str(corrR) != ""):
 		prefix = "In the confirmatory phase, using high-concentration phospholipid, "
 		suffix = " ({:0.0f}%, upper limit of normal {:0.0f}%).".format(percentR*100,percentU*100)
 		if corrR > initR:			s.append(prefix + "there is no shortening of the clotting time.")
@@ -78,7 +80,7 @@ def MiddleSection(testname, initR, initU, initP, mixR, mixU, mixP, corrR, percen
 		elif percentR <= 0.01499:		s.append(prefix + "the clotting time shortens only minimally, but certainly does not approach anywhere close to the 99th percentile upper limit of the normal reference interval" + suffix)
 		elif (percentR >0.01499) and (percentR <= 0.05):  s.append(prefix + "the clotting time shortens, but does not approach the 99th percentile upper limit of the normal reference interval" + suffix)
 		else:			s.append("In the confirmatory phase, using high-concentration phospholipid, the clotting time shortens, but does not exceed the 99th percentile upper limit of the normal reference interval" + suffix)
-	else:	s.append("In the mixing phase of the " + testname + " system, the clotting time is normal.")	
+	
 	return " ".join(s)
 
 def header(d,filename):
