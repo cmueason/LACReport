@@ -1,4 +1,3 @@
-#!/Users/ernestchan/bin/python
 import os
 import lupus
 import sys
