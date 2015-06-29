@@ -76,7 +76,8 @@ def MiddleSection(testname, initR, initU, initP, mixR, mixU, mixP, corrR, percen
 		suffix = " ({:0.0f}%, upper limit of normal {:0.0f}%).".format(percentR*100,percentU*100)
 		if corrR > initR:			s.append(prefix + "there is no shortening of the clotting time.")
 		elif percentR >= percentU+0.005:	s.append(prefix + "there is a significant shortening of the clotting time" + suffix)
-	        elif abs(percentR - percentU) <0.005:   s.append(prefix + "the clotting time shortens and does come quite close to the 99th percentile upper limit of the normal reference interval" + suffix)
+	        elif abs(percentR - percentU) <0.005:   s.append(prefix + "the clotting time shortens and does come quite close to the 99th percentile upper limit of the normal reference interval" + suffix)i
+		elif abs(percentR - percentU) < 0.015:	s.append(prefix + "the clotting time shortens and approaches, but does not exceed, the 99th percentile upper limit of the normal reference interval" + suffix)
 		elif percentR <= 0.01499:		s.append(prefix + "the clotting time shortens only minimally, but certainly does not approach anywhere close to the 99th percentile upper limit of the normal reference interval" + suffix)
 		elif (percentR >0.01499) and (percentR <= 0.05):  s.append(prefix + "the clotting time shortens, but does not approach the 99th percentile upper limit of the normal reference interval" + suffix)
 		else:			s.append("In the confirmatory phase, using high-concentration phospholipid, the clotting time shortens, but does not exceed the 99th percentile upper limit of the normal reference interval" + suffix)
