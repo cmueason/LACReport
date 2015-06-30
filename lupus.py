@@ -51,7 +51,7 @@ def first(d):
 			
 			if str(d["LTTHEP_R"]) != "":
 				if d["LTT_R"] < d["LTTHEP_R"]:	s.append("Following incubation of the plasma with heparinase, the thrombin time does not shorten, and remains prolonged by {:0.1f} seconds.".format(d["LTTHEP_P"]))
-				else:				s.append("Following incubation of the plasma with heparinase, the thrombin time shortens by {0.1f}.".format(d["LTT_R"] - d["LTTHEP_R"]))
+				else:				s.append("Following incubation of the plasma with heparinase, the thrombin time shortens by {:0.1f} seconds.".format(d["LTT_R"] - d["LTTHEP_R"]))
 	return " ".join(s) 
 
 # generates the second portion of output
