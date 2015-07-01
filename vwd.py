@@ -99,19 +99,28 @@ def conclusion(d, filename):
 	(sentence, result) = helper("vWF collagen-binding activity", CBAR,CBAL,CBAU, result)	
 	s.append(sentence)	
 
+	if (RCOO > 60) and (CBAO > 60) and (ATGO > 60):
+		s.append("Ratios of each of the von Willebrand factor functional activities to von Willebrand factor antigen are all normal.")
 
 	# Factor 8
 	if F8R > F8U:
-		s.append("\n\nThe Factor VIII level is also "+qualify(F8R-F8U)+" increased at {:0.0f}% (range of normal is {:0.0f}% to {:0.0f}%).".format(F8R,F8L,F8U))
+		s.append("\n\nThe Factor VIII level is also "+qualify(F8R-F8U)+" increased at {:0.0f}% (normal range {:0.0f}% to {:0.0f}%).".format(F8R,F8L,F8U))
+	elif (F8R < F8U) and (F8R > F8L):
+		s.append("The Factor VIII level is normal at {:0.0f}% (normal range {:0.0f}% to {:0.0f}%).".format(F8R, F8L, F8U))
 
 	s.append("\n\nConclusion:")
 
 	# conclusion
-	if min(ATGO, CBAO, RCOO) >=0.7:
+	if min(ATGO, CBAO, RCOO) >= 60:
 		s.append("The current results provide no evidence for a diagnosis of von Willebrand disease.")
 	else:
+		a =  min(ATGR-ATGL, CBAR-CBAL, RCOR-RCOL)  
+		b =  max(ATGR-ATGL, CBAR-CBAL, RCOR-RCOL)  
 		# there might be disease!
-		pass
+		if (a >= 0) and (b <=15):
+			s.append("The results in this study are insufficient to support a diagnosis of von Willebrand disease. That said, we note that the values are all in the lower region of the respective normal reference intervals. Since vWF and Factor VIII are well known to vary over time in their levels, and for example to be increased during times of stress, we would uggest that these assays be repeated once or possibly even twice more in the coming months, if the etiology of the patient's clinical bleeding remains unclear. In the event that the patient's basal levels of vWF/Factor VIII are actually lower, and we could possibly now be measuring them at their relatively high values, this would constitute important information.")
+		elif (b<0):
+			s.append("The current results provide support for a diagnosis of von Willebrand disease.")
 
 	if ATGR > ATGU + 20:
 		if F8R > F8U + 20:
