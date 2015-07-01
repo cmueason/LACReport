@@ -151,7 +151,7 @@ def processXLS(filename, attending):
 	print s
 
 	# write to file
-	writeFile(s,filename.replace(".xls", ".docx"))
+	writeFile(s,filename.replace(".xls", ".doc"))
 
 # look at arguments
 #print 'Number of arguments:', len(sys.argv), 'arguments.'
