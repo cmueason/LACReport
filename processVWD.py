@@ -19,7 +19,11 @@ def readFile(filename):
 	d["PT_MRN"] = sheet.cell_value(4, 6)
 	d["DATE"] = sheet.cell_value(5, 6)
 
-	d["F8R"] = round(sheet.cell_value(11,1))
+	try:
+		d["F8R"] = round(sheet.cell_value(11,1))
+	except:
+		d["F8R"] = -1 
+ 
 	d["ATGR"] = round(sheet.cell_value(12,1))
 	d["RCOR"] = round(sheet.cell_value(13,1))
 	d["CBAR"] = round(sheet.cell_value(14,1))
