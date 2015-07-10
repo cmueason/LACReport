@@ -193,7 +193,7 @@ def processXLS(filename, attending):
 
 if __name__ == "__main__":
 	if len(sys.argv)<2:
-		print "Usage: "+sys.argv[0]+" filename.xlsx + miller|treml|sandeep|wool"
+		print "Usage: "+sys.argv[0]+" filename.xlsx miller|treml|sandeep|wool"
 		exit(0)
 	attending = "miller" if len(sys.argv) <= 2 else sys.argv[2]		
 	filename = sys.argv[1]
