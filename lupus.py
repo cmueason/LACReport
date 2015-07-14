@@ -30,8 +30,8 @@ def first(d):
 	s = []
 	if d["LAPTT_R"]>d["LAPTT_U"]:	s.append("In the aPTT-based system, the initial clotting time is "+qualify(d["LAPTT_P"]) +" prolonged at {:0.1f} seconds.".format(d["LAPTT_R"]))
 	else:				s.append("In the aPTT-based system, the initial clotting time is normal.")
-
-	if d["LAPTT_R"]>d["LAPTT_U"]-1.5:
+	
+	if (str(d["PTTMX_R"]) != ""):
 		prefix = "In the mixing phase of the aPTT-based system, the clotting time "
 		if d["PTTMX_R"]>d["LAPTT_R"]: 	s.append(prefix + "actually prolongs slightly, and this prolongation is {:0.1f} seconds beyond the upper limit of the normal reference interval for this phase of testing.".format(d["PTTMX_P"]))
                 elif d["PTTMX_P"] == 0:         s.append(prefix + "is now within the normal reference interval.")
@@ -39,19 +39,19 @@ def first(d):
                 elif reduction(d["LAPTT_R"], d["PTTMX_R"]):   s.append(prefix + "shortens dramatically, but still remains prolonged by {:0.1f} seconds beyond the upper normal limit for that phase of testing.".format(d["PTTMX_P"]))
                 else:  	s.append(prefix + "shortens, but still remains prolonged by {:0.1f} seconds beyond the upper normal limit for that phase of testing.".format(d["PTTMX_P"]))
 
-		if d["PNP_R"]>0:
-			if d["PNP_R"]<d["PNP_R_LYS"]:	s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), the clotting time does not shorten in the presence of platelet lysate.")
-			elif d["PNP_SD"]>=d["PNP_U"]:   s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
-			else:	s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is shortening of the clotting time, but does not exceed the significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
+	if d["PNP_R"]>0:
+		if d["PNP_R"]<d["PNP_R_LYS"]:	s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), the clotting time does not shorten in the presence of platelet lysate.")
+		elif d["PNP_SD"]>=d["PNP_U"]:   s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
+		else:	s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is shortening of the clotting time, but does not exceed the significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
 		
-		if str(d["LTT_R"])!="":
-			if d["LTT_R"]<d["LTT_L"]:	s.append("The thrombin time is short at {:0.1f} seconds (lower limit of normal is {:0.1f} seconds), a finding suggestive of possibly increased fibrinogen.".format(d["LTT_R"],d["LTT_L"]))
-			elif d["LTT_R"]>d["LTT_U"]:	s.append("The thrombin time is "+qualify(d["LTT_P"])+" prolonged at {:0.1f} seconds.".format(d["LTT_R"]))
-			else:				s.append("The thrombin time is normal.")
+	if str(d["LTT_R"])!="":
+		if d["LTT_R"]<d["LTT_L"]:	s.append("The thrombin time is short at {:0.1f} seconds (lower limit of normal is {:0.1f} seconds), a finding suggestive of possibly increased fibrinogen.".format(d["LTT_R"],d["LTT_L"]))
+		elif d["LTT_R"]>d["LTT_U"]:	s.append("The thrombin time is "+qualify(d["LTT_P"])+" prolonged at {:0.1f} seconds.".format(d["LTT_R"]))
+		else:				s.append("The thrombin time is normal.")
 			
-			if str(d["LTTHEP_R"]) != "":
-				if d["LTT_R"] < d["LTTHEP_R"]:	s.append("Following incubation of the plasma with heparinase, the thrombin time does not shorten, and remains prolonged by {:0.1f} seconds.".format(d["LTTHEP_P"]))
-				else:				s.append("Following incubation of the plasma with heparinase, the thrombin time shortens by {:0.1f} seconds.".format(d["LTT_R"] - d["LTTHEP_R"]))
+		if str(d["LTTHEP_R"]) != "":
+			if d["LTT_R"] < d["LTTHEP_R"]:	s.append("Following incubation of the plasma with heparinase, the thrombin time does not shorten, and remains prolonged by {:0.1f} seconds.".format(d["LTTHEP_P"]))
+			else:				s.append("Following incubation of the plasma with heparinase, the thrombin time shortens by {:0.1f} seconds.".format(d["LTT_R"] - d["LTTHEP_R"]))
 	return " ".join(s) 
 
 # generates the second portion of output
