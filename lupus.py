@@ -118,20 +118,20 @@ def conclusionAlgorithm(d):
     def sumConditions(C1, C2, C3):
 	return reduce(operator.add, map(lambda x: 1 if x else 0, [C1,C2,C3]), 0)
 
-    (C1,C2,C3) = (LAPTT >= 6, DRVVT >= 0.20, DPT >= 0.20)
+    (C1,C2,C3) = (LAPTT >= d["PNP_U"]*2, DRVVT >= 0.20, DPT >= 0.20)
     if (sumConditions(C1,C2,C3)>=1) and (Case==""):
         Case="STRONG"
         s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides strong evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
 
-    (C1,C2,C3) = (LAPTT >= 3.05, DRVVT >= 0.135, DPT >= 0.115)
+    (C1,C2,C3) = (LAPTT >= d["PNP_U"], DRVVT >= d["PCTCO_U"], DPT >= d["DPTCOR_U"])
     if (sumConditions(C1,C2,C3)>=2)  and (Case==""):
         Case = "POSITIVE"
         s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
     
-    (C1,C2,C3) = ((LAPTT >= 2.5) and (LAPTT < 3.05), (DRVVT >= 0.095) and (DRVVT < 0.135), (DPT >= 0.095) and (DPT < 0.115))
-    if (sumConditions(C1,C2,C3)>=2)  and (Case == ""):
-        Case = "BORDERLINE"
-        s.append("The current testing, notably in "+helper(C1,C2,C3)+", reaches only to borderline significance for the identification of a functional lupus anticoagulant. ")
+    #(C1,C2,C3) = ((LAPTT >= 2.5) and (LAPTT < 3.05), (DRVVT >= 0.095) and (DRVVT < 0.135), (DPT >= 0.095) and (DPT < 0.115))
+    #if (sumConditions(C1,C2,C3)>=2)  and (Case == ""):
+    #    Case = "BORDERLINE"
+    #    s.append("The current testing, notably in "+helper(C1,C2,C3)+", reaches only to borderline significance for the identification of a functional lupus anticoagulant. ")
 
     # fondaparinux
     if d["fondaparinux"]:
@@ -181,15 +181,29 @@ def footer(attending):
 	else:				return "Jonathan Miller, MD, PhD, Director of Coagulation Laboratory\t\t" + formatdate
 
 def report(d,filename, attending):
-	DRVVTSection = MiddleSection("DRVVT-based", d["DRVVS_R"], d["DRVVS_U"], d["DRVVS_P"], d["DRVVMX_R"],d["DRVVMX_U"],d["DRVVMX_P"], d["DRVVC_R"], d["PCTCO_R"], d["PCTCO_U"])
-	DPTSection = MiddleSection("DPT-based", d["DPTS_R"], d["DPTS_U"], d["DPTS_P"], d["DPTMX_R"],d["DPTMX_U"],d["DPTMX_P"], d["DPTC_R"],d["DPTCOR_R"], d["DPTCOR_U"])
-	return header(d, filename) + "\n\n" + first(d) + "\n\n" + DRVVTSection + "\n\n" + DPTSection + "\n\n" + conclusion(d, filename) + "\n\n\n\n\n" + footer(attending)
+	try:
+		S1 = first(d)
+	except:
+		S1 = "An error occurred while generating the APTT section."
+	try:
+		DRVVTSection = MiddleSection("DRVVT-based", d["DRVVS_R"], d["DRVVS_U"], d["DRVVS_P"], d["DRVVMX_R"],d["DRVVMX_U"],d["DRVVMX_P"], d["DRVVC_R"], d["PCTCO_R"], d["PCTCO_U"])
+	except:
+		DRVVTSection = "An error occurred while generating the DRVVT section."
+	try:
+		DPTSection = MiddleSection("DPT-based", d["DPTS_R"], d["DPTS_U"], d["DPTS_P"], d["DPTMX_R"],d["DPTMX_U"],d["DPTMX_P"], d["DPTC_R"],d["DPTCOR_R"], d["DPTCOR_U"])
+	except:
+		DPTSection = "An error occurred while generating the DPT section."
+	return header(d, filename) + "\n\n" + S1 + "\n\n" + DRVVTSection + "\n\n" + DPTSection + "\n\n" + conclusion(d, filename) + "\n\n\n\n\n" + footer(attending)
 
 def processXLS(filename, attending):
-	myhash = readFile(filename)
-	s = report(myhash,filename, attending)
-	print s
-	writeFile(s,os.path.join(OUTPUTDIR, os.path.basename(filename.replace(".xls", ".docx"))))
+	print("Processing "+filename+"...")
+	try:
+		myhash = readFile(filename)
+		s = report(myhash,filename, attending)
+		print s
+		writeFile(s,os.path.join(OUTPUTDIR, os.path.basename(filename.replace(".xls", ".docx"))))
+	except:
+		pass
 
 if __name__ == "__main__":
 	if len(sys.argv)<2:
@@ -198,5 +212,4 @@ if __name__ == "__main__":
 	attending = "miller" if len(sys.argv) <= 2 else sys.argv[2]		
 	filename = sys.argv[1]
 	processXLS(filename, attending)
-
 
