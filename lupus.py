@@ -118,20 +118,15 @@ def conclusionAlgorithm(d):
     def sumConditions(C1, C2, C3):
 	return reduce(operator.add, map(lambda x: 1 if x else 0, [C1,C2,C3]), 0)
 
-    #(C1,C2,C3) = (LAPTT >= d["PNP_U"]*2, DRVVT >= 1.5*d["PCTCO_U"], DPT >= 1.5*d["DPTCOR_U"])
-    #if (sumConditions(C1,C2,C3)>=1) and (Case==""):
-    #    Case="STRONG"
-    #    s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides strong evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
-
     (C1,C2,C3) = (round(LAPTT*10) > round(d["PNP_U"]*10), round(DRVVT*100) > round(d["PCTCO_U"]*100), round(DPT*100) > round(d["DPTCOR_U"]*100))
     if (sumConditions(C1,C2,C3)>=1)  and (Case==""):
         Case = "POSITIVE"
+        print "# Case is positive"
         s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
-    
-    #(C1,C2,C3) = ((LAPTT >= 2.5) and (LAPTT < 3.05), (DRVVT >= 0.095) and (DRVVT < 0.135), (DPT >= 0.095) and (DPT < 0.115))
-    #if (sumConditions(C1,C2,C3)>=2)  and (Case == ""):
-    #    Case = "BORDERLINE"
-    #    s.append("The current testing, notably in "+helper(C1,C2,C3)+", reaches only to borderline significance for the identification of a functional lupus anticoagulant. ")
+    if (sumConditions(C1,C2,C3)==3)  and Case=="":
+        print "# Case is negative"
+        s.append("This study does not provide evidence for the identification of a functional lupus anticoagulant.")
+        Case  = "NEGATIVE"
 
     # fondaparinux
     if d["fondaparinux"]:
@@ -140,16 +135,6 @@ def conclusionAlgorithm(d):
     if d["rivaroxaban"]:
 	s.append("Review of this patient's chart indicates that he is presently receiving the anti-Xa drug, rivaroxaban.  Recent literature demonstrates that this anticoagulant exerts a greater inhibitory effect upon the initial phase of the DRVVT as opposed to its effect upon the confirmatory phase, and accordingly rivaroxaban by itself is capable of producing a false positive pattern mimicking that of a lupus anticoagulant in the DRVVT-based testing system. Thus, we are unable based upon the present studies alone to determine how much of the abnormality seen in the functional testing is simply an artifact of the rivaroxaban anticoagulation, and how much might be resulting from the actual presence of a lupus anticoagulant.  Repeat DRVVT-based testing at such time that the patient is no longer receiving rivaroxaban may be considered.")
 
-    #(C1,C2,C3) = ((LAPTT < 0.03), (DRVVT <= 0.03), (DPT < 0.03))
-    #if (sumConditions(C1,C2,C3)==3)  and Case=="":
-    #    s.append("The results of this study provide no evidence to suggest the identification of a functional lupus anticoagulant.")
-    #    Case = "STRONG NEGATIVE"    
-
-    (C1, C2, C3) = ((LAPTT <= d["PNP_U"]), (DRVVT <= d["PCTCO_U"]), (DPT < d["DPTCOR_U"]))
-    if (sumConditions(C1,C2,C3)==3)  and Case=="":
-        s.append("This study does not provide evidence for the identification of a functional lupus anticoagulant.")
-        Case  = "NEGATIVE"
-
     (C1,C2,C3) = (reduction(d["LAPTT_R"],d["PTTMX_R"], 0.18), reduction(d["DRVVS_R"],d["DRVVMX_R"], 0.18), reduction(d["DPTS_R"],d["DPTMX_R"],0.18))
     if d["warfarin"]:
         if (sumConditions(C1,C2,C3)>1):  s.append("\n\nNote: The marked prolongations of the initial clotting times seen in " + helper(C1, C2, C3) + ", together with substantial shortening in the mixing phases, appear consistent with the patient's history of anticoagulation with warfarin.") 
@@ -157,8 +142,8 @@ def conclusionAlgorithm(d):
     else:
 	if (sumConditions(C1,C2,C3)>=1):
         	s.append("\n\nNote: The prolonged initial clotting times with shortening upon mixing with normal plasma in " + helper(C1, C2, C3) + " suggests the deficiency of one or more clotting factors. This would appear consistent with the increased INR noted in the patient's chart. Diet, poor vitamin K absorption, or the effect of antibiotics upon gut bacteria all could be possible underlying causes.")
-		if d["LTT_R"]>d["LTT_U"]:
-			s.append("In addition, we have noted a slight prolongation of the patient's thrombin time that appears unrelated to any heparin effect. An abnormality in fibrinogen or perhaps an increase in fibrin split products could be among the possible explanations for this finding.") 
+	if d["LTT_R"]>d["LTT_U"]:
+		s.append("In addition, we have noted a slight prolongation of the patient's thrombin time that appears unrelated to any heparin effect. An abnormality in fibrinogen or perhaps an increase in fibrin split products could be among the possible explanations for this finding.") 
     return " ".join(s)
     
 def conclusion(d, filename):
@@ -192,11 +177,11 @@ def report(d,filename, attending):
 	return header(d, filename) + "\n\n" + S1 + "\n\n" + DRVVTSection + "\n\n" + DPTSection + "\n\n" + Conclusion + "\n\n\n\n\n" + footer(attending)
 
 def processXLS(filename, attending):
-	print("===============\nProcessing "+filename+"...")
+	print("===============\n# Processing "+filename+"...")
 	try:
 		myhash = readFile(filename)
 		s = report(myhash,filename, attending)
-		print s
+		print "#" + s
 		writeFile(s,os.path.join(OUTPUTDIR, os.path.basename(filename.replace(".xls", ".docx"))))
 	except:
 		pass
