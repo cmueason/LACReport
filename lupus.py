@@ -118,13 +118,13 @@ def conclusionAlgorithm(d):
     def sumConditions(C1, C2, C3):
 	return reduce(operator.add, map(lambda x: 1 if x else 0, [C1,C2,C3]), 0)
 
-    (C1,C2,C3) = (LAPTT >= d["PNP_U"]*2, DRVVT >= 0.20, DPT >= 0.20)
-    if (sumConditions(C1,C2,C3)>=1) and (Case==""):
-        Case="STRONG"
-        s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides strong evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
+    #(C1,C2,C3) = (LAPTT >= d["PNP_U"]*2, DRVVT >= 1.5*d["PCTCO_U"], DPT >= 1.5*d["DPTCOR_U"])
+    #if (sumConditions(C1,C2,C3)>=1) and (Case==""):
+    #    Case="STRONG"
+    #    s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides strong evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
 
-    (C1,C2,C3) = (LAPTT >= d["PNP_U"], DRVVT >= d["PCTCO_U"], DPT >= d["DPTCOR_U"])
-    if (sumConditions(C1,C2,C3)>=2)  and (Case==""):
+    (C1,C2,C3) = (round(LAPTT*10) > round(d["PNP_U"]*10), round(DRVVT*100) > round(d["PCTCO_U"]*100), round(DPT*100) > round(d["DPTCOR_U"]*100))
+    if (sumConditions(C1,C2,C3)>=1)  and (Case==""):
         Case = "POSITIVE"
         s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
     
@@ -140,12 +140,12 @@ def conclusionAlgorithm(d):
     if d["rivaroxaban"]:
 	s.append("Review of this patient's chart indicates that he is presently receiving the anti-Xa drug, rivaroxaban.  Recent literature demonstrates that this anticoagulant exerts a greater inhibitory effect upon the initial phase of the DRVVT as opposed to its effect upon the confirmatory phase, and accordingly rivaroxaban by itself is capable of producing a false positive pattern mimicking that of a lupus anticoagulant in the DRVVT-based testing system. Thus, we are unable based upon the present studies alone to determine how much of the abnormality seen in the functional testing is simply an artifact of the rivaroxaban anticoagulation, and how much might be resulting from the actual presence of a lupus anticoagulant.  Repeat DRVVT-based testing at such time that the patient is no longer receiving rivaroxaban may be considered.")
 
-    (C1,C2,C3) = ((LAPTT == 0), (DRVVT == 0), (DPT == 0))
-    if (sumConditions(C1,C2,C3)==3)  and Case=="":
-        s.append("The results of this study provide no evidence to suggest the identification of a functional lupus anticoagulant.")
-        Case = "STRONG NEGATIVE"    
+    #(C1,C2,C3) = ((LAPTT < 0.03), (DRVVT <= 0.03), (DPT < 0.03))
+    #if (sumConditions(C1,C2,C3)==3)  and Case=="":
+    #    s.append("The results of this study provide no evidence to suggest the identification of a functional lupus anticoagulant.")
+    #    Case = "STRONG NEGATIVE"    
 
-    (C1, C2, C3) = ((LAPTT < 2.5), (DRVVT < 0.95), (DPT < 0.95))
+    (C1, C2, C3) = ((LAPTT <= d["PNP_U"]), (DRVVT <= d["PCTCO_U"]), (DPT < d["DPTCOR_U"]))
     if (sumConditions(C1,C2,C3)==3)  and Case=="":
         s.append("This study does not provide evidence for the identification of a functional lupus anticoagulant.")
         Case  = "NEGATIVE"
@@ -181,22 +181,18 @@ def footer(attending):
 	else:				return "Jonathan Miller, MD, PhD, Director of Coagulation Laboratory\t\t" + formatdate
 
 def report(d,filename, attending):
-	try:
-		S1 = first(d)
-	except:
-		S1 = "An error occurred while generating the APTT section."
-	try:
-		DRVVTSection = MiddleSection("DRVVT-based", d["DRVVS_R"], d["DRVVS_U"], d["DRVVS_P"], d["DRVVMX_R"],d["DRVVMX_U"],d["DRVVMX_P"], d["DRVVC_R"], d["PCTCO_R"], d["PCTCO_U"])
-	except:
-		DRVVTSection = "An error occurred while generating the DRVVT section."
-	try:
-		DPTSection = MiddleSection("DPT-based", d["DPTS_R"], d["DPTS_U"], d["DPTS_P"], d["DPTMX_R"],d["DPTMX_U"],d["DPTMX_P"], d["DPTC_R"],d["DPTCOR_R"], d["DPTCOR_U"])
-	except:
-		DPTSection = "An error occurred while generating the DPT section."
-	return header(d, filename) + "\n\n" + S1 + "\n\n" + DRVVTSection + "\n\n" + DPTSection + "\n\n" + conclusion(d, filename) + "\n\n\n\n\n" + footer(attending)
+	try:		S1 = first(d)
+	except:		S1 = "An error occurred while generating the APTT section."
+	try:		DRVVTSection = MiddleSection("DRVVT-based", d["DRVVS_R"], d["DRVVS_U"], d["DRVVS_P"], d["DRVVMX_R"],d["DRVVMX_U"],d["DRVVMX_P"], d["DRVVC_R"], d["PCTCO_R"], d["PCTCO_U"])
+	except:		DRVVTSection = "An error occurred while generating the DRVVT section."
+	try:		DPTSection = MiddleSection("DPT-based", d["DPTS_R"], d["DPTS_U"], d["DPTS_P"], d["DPTMX_R"],d["DPTMX_U"],d["DPTMX_P"], d["DPTC_R"],d["DPTCOR_R"], d["DPTCOR_U"])
+	except:		DPTSection = "An error occurred while generating the DPT section."
+        try:		Conclusion = conclusion(d, filename)
+	except: 	Conclusion = "An error occurred while generating the conclusion."
+	return header(d, filename) + "\n\n" + S1 + "\n\n" + DRVVTSection + "\n\n" + DPTSection + "\n\n" + Conclusion + "\n\n\n\n\n" + footer(attending)
 
 def processXLS(filename, attending):
-	print("Processing "+filename+"...")
+	print("===============\nProcessing "+filename+"...")
 	try:
 		myhash = readFile(filename)
 		s = report(myhash,filename, attending)
