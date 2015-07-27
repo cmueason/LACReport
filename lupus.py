@@ -142,8 +142,8 @@ def conclusionAlgorithm(d):
     else:
 	if (sumConditions(C1,C2,C3)>=1):
         	s.append("\n\nNote: The prolonged initial clotting times with shortening upon mixing with normal plasma in " + helper(C1, C2, C3) + " suggests the deficiency of one or more clotting factors. This would appear consistent with the increased INR noted in the patient's chart. Diet, poor vitamin K absorption, or the effect of antibiotics upon gut bacteria all could be possible underlying causes.")
-	if d["LTT_R"]>d["LTT_U"]:
-		s.append("In addition, we have noted a slight prolongation of the patient's thrombin time that appears unrelated to any heparin effect. An abnormality in fibrinogen or perhaps an increase in fibrin split products could be among the possible explanations for this finding.") 
+        #if d["LTT_R"]>d["LTT_U"]:
+	#	s.append("In addition, we have noted a slight prolongation of the patient's thrombin time that appears unrelated to any heparin effect. An abnormality in fibrinogen or perhaps an increase in fibrin split products could be among the possible explanations for this finding.") 
     return " ".join(s)
     
 def conclusion(d, filename):
