@@ -123,7 +123,7 @@ def conclusionAlgorithm(d):
         Case = "POSITIVE"
         print "# Case is positive"
         s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
-    if (sumConditions(C1,C2,C3)==3)  and Case=="":
+    if (sumConditions(C1,C2,C3)==0)  and Case=="":
         print "# Case is negative"
         s.append("This study does not provide evidence for the identification of a functional lupus anticoagulant.")
         Case  = "NEGATIVE"
