@@ -149,11 +149,18 @@ def conclusionAlgorithm(d):
 def conclusion(d, filename):
 	s = ["Conclusion:"]
 	s.append(conclusionAlgorithm(d))
-	for i in findFiles(filename):
-		concl = extractConclusion(i)
-		concl = concl.replace("Conclusion:","")		
-		if len(concl)>0:
-			s.append("\n\nPrevious conclusion (" + i + "): " + str(concl))
+	try:
+		for i in findFiles(filename):
+			concl = extractConclusion(i)
+			concl = concl.replace("Conclusion:","")		
+			if len(concl)>0:
+				s.append("\n\nPrevious conclusion (" + i + "): " + str(concl))
+	except Exception as inst: 
+		s.append("An error occurred while tracting the conclusion from a previous report.")
+		print type(inst)
+		print inst.args
+		print inst
+
 	return " ".join(s)
 
 def footer(attending):
@@ -173,7 +180,11 @@ def report(d,filename, attending):
 	try:		DPTSection = MiddleSection("DPT-based", d["DPTS_R"], d["DPTS_U"], d["DPTS_P"], d["DPTMX_R"],d["DPTMX_U"],d["DPTMX_P"], d["DPTC_R"],d["DPTCOR_R"], d["DPTCOR_U"])
 	except:		DPTSection = "An error occurred while generating the DPT section."
         try:		Conclusion = conclusion(d, filename)
-	except: 	Conclusion = "An error occurred while generating the conclusion."
+	except Exception as inst: 	
+		Conclusion = "An error occurred while generating the conclusion."
+		print type(inst)
+		print inst.args
+		print inst
 	return header(d, filename) + "\n\n" + S1 + "\n\n" + DRVVTSection + "\n\n" + DPTSection + "\n\n" + Conclusion + "\n\n\n\n\n" + footer(attending)
 
 def processXLS(filename, attending):
