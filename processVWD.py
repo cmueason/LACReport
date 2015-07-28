@@ -9,6 +9,19 @@ import re
 
 # this file has a function that processes one file, and returns a hash with all the values
 
+
+def myround100(x):
+	try:
+		return round(x*100)
+	except:
+		return (-1)
+
+def myround(x):
+	try:
+		return round(x)
+	except:
+		return (-1)
+
 def readFile(filename):
 	book = open_workbook(filename,on_demand=True)
 	for name in book.sheet_names():
@@ -24,24 +37,24 @@ def readFile(filename):
 	except:
 		d["F8R"] = -1 
  
-	d["ATGR"] = round(sheet.cell_value(12,1))
-	d["RCOR"] = round(sheet.cell_value(13,1))
-	d["CBAR"] = round(sheet.cell_value(14,1))
+	d["ATGR"] = myround(sheet.cell_value(12,1))
+	d["RCOR"] = myround(sheet.cell_value(13,1))
+	d["CBAR"] = myround(sheet.cell_value(14,1))
 
-	d["F8L"] = round(sheet.cell_value(11,2) * 100)
-	d["ATGL"] = round(sheet.cell_value(12,2) * 100)
-	d["RCOL"] = round(sheet.cell_value(13,2) * 100)
-	d["CBAL"] = round(sheet.cell_value(14,2) * 100)
+	d["F8L"] = myround100(sheet.cell_value(11,2))
+	d["ATGL"] = myround100(sheet.cell_value(12,2))
+	d["RCOL"] = myround100(sheet.cell_value(13,2))
+	d["CBAL"] = myround100(sheet.cell_value(14,2))
 
-	d["F8U"] = round(sheet.cell_value(11,3) * 100)
-	d["ATGU"]= round(sheet.cell_value(12,3) * 100)
-	d["RCOU"] = round(sheet.cell_value(13,3) * 100)
-	d["CBAU"] = round(sheet.cell_value(14,3) * 100)
+	d["F8U"] = myround100(sheet.cell_value(11,3))
+	d["ATGU"]= myround100(sheet.cell_value(12,3))
+	d["RCOU"] = myround100(sheet.cell_value(13,3))
+	d["CBAU"] = myround100(sheet.cell_value(14,3))
 
-	d["F8O"] = round(sheet.cell_value(11,5) * 100)
-	d["ATGO"]= round(sheet.cell_value(12,5) * 100)
-	d["RCOO"] = round(sheet.cell_value(13,5) * 100)
-	d["CBAO"] = round(sheet.cell_value(14,5) * 100)
+	d["F8O"] = myround100(sheet.cell_value(11,5))
+	d["ATGO"]= myround100(sheet.cell_value(12,5))
+	d["RCOO"] = myround100(sheet.cell_value(13,5))
+	d["CBAO"] = myround100(sheet.cell_value(14,5))
 
 	return d
 
