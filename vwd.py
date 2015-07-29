@@ -37,7 +37,7 @@ def header(d,filename):
 		s.append("%02d%02d%02d" % (a-2000,b,c))
 		return " ".join(s)
 	except:
-		return filename.replace(".xls","")
+		return os.path.basename(filename).replace(".xlsx","").replace(".xls","")
 		
 def conclusion(d, filename):
 	s = []
