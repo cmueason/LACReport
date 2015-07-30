@@ -100,7 +100,7 @@ def conclusion(d, filename):
 	s.append(sentence)	
 
 	if (RCOO > 60) and (CBAO > 60) and (ATGO > 60):
-		s.append("Ratios of each of the von Willebrand factor functional activities to von Willebrand factor antigen are all normal.")
+		s.append("Ratios of each of the von Willebrand factor functional activities to von Willebrand factor antigen are both normal.")
 
 	# Factor 8
 	if F8R > F8U:
