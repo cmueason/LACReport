@@ -48,8 +48,12 @@ def first(d):
                 else:  	s.append(prefix + "shortens, but still remains prolonged by {:0.1f} seconds beyond the upper normal limit for that phase of testing.".format(d["PTTMX_P"]))
 
 	if d["PNP_R"]>0:
-		if d["PNP_R"]<d["PNP_R_LYS"]:	s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), the clotting time does not shorten in the presence of platelet lysate.")
-		elif d["PNP_SD"]>=d["PNP_U"]:   s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
+		if d["PNP_R"]<d["PNP_R_LYS"]:	
+			if d["PNP_SD"]>d["PNP_U"]: 
+				s.append("An abnormality is also observed in the confirmatory phase of the aPTT-based system (platelet neutralization procedure) with the patient at {:0.1f} SD, and the upper limit of normal {:0.1f} SD.".format( d["PNP_SD"],d["PNP_U"]))
+			else:
+				s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), the clotting time does not shorten in the presence of platelet lysate.")
+		elif d["PNP_SD"]>d["PNP_U"]:   s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
 		else:	s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is shortening of the clotting time, but does not exceed the significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
 		
 	if str(d["LTT_R"])!="":
