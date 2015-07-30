@@ -28,11 +28,19 @@ def reduction(before, after, cutoff=0.35):
 # generates the first portion of output
 def first(d):
 	s = []
+	bSubsequentStudy = False
 	if d["LAPTT_R"]>d["LAPTT_U"]:	s.append("In the aPTT-based system, the initial clotting time is "+qualify(d["LAPTT_P"]) +" prolonged at {:0.1f} seconds.".format(d["LAPTT_R"]))
+	elif d["LAPTT_U"] - d["LAPTT_R"] <= 1.0:	
+		s.append("In the aPTT-based system, the initial clotting time is very close to the upper limit of normal.")
+		bSubsequentStudy = True
 	else:				s.append("In the aPTT-based system, the initial clotting time is normal.")
 	
 	if (str(d["PTTMX_R"]) != ""):
-		prefix = "In the mixing phase of the aPTT-based system, the clotting time "
+		if bSubsequentStudy:
+			prefix = "In a subsequent mixing study performed in the aPTT-based system, the clotting time "
+		else:
+			prefix = "In the mixing phase of the aPTT-based system, the clotting time "
+
 		if d["PTTMX_R"]>d["LAPTT_R"]: 	s.append(prefix + "actually prolongs slightly, and this prolongation is {:0.1f} seconds beyond the upper limit of the normal reference interval for this phase of testing.".format(d["PTTMX_P"]))
                 elif d["PTTMX_P"] == 0:         s.append(prefix + "is now within the normal reference interval.")
 		elif d["PTTMX_P"] <= 1.0:       s.append(prefix + "nearly corrects into the normal range, and remains prolonged by only {:0.1f} seconds beyond the upper reference limit for that phase of testing.".format(d["PTTMX_P"]))
