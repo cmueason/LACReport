@@ -27,6 +27,13 @@ def reduction(before, after, cutoff=0.35):
 
 # generates the first portion of output
 def first(d):
+	# for heparin
+	(drug, LAPTT, DRVVT, DPT) = (d["DRUG"], d["PNP_SD"], d["PCTCO_R"], d["DPTCOR_R"])
+	mydrugs = ["heparin", "warfarin", "enoxaparin", "argatroban", "lmwh", "lovenox", "fondaparinux", "aspirin", "rivaroxaban"]
+	drug = drug.lower()
+	for i in mydrugs:  d[i] = (i in drug)
+
+
 	s = []
 	bSubsequentStudy = False
 	if d["LAPTT_R"]>d["LAPTT_U"]:	s.append("In the aPTT-based system, the initial clotting time is "+qualify(d["LAPTT_P"]) +" prolonged at {:0.1f} seconds.".format(d["LAPTT_R"]))
@@ -62,8 +69,18 @@ def first(d):
 		else:				s.append("The thrombin time is normal.")
 			
 		if str(d["LTTHEP_R"]) != "":
-			if d["LTT_R"] < d["LTTHEP_R"]:	s.append("Following incubation of the plasma with heparinase, the thrombin time does not shorten, and remains prolonged by {:0.1f} seconds.".format(d["LTTHEP_P"]))
-			else:				s.append("Following incubation of the plasma with heparinase, the thrombin time shortens by {:0.1f} seconds.".format(d["LTT_R"] - d["LTTHEP_R"]))
+			if d["LTT_R"] < d["LTTHEP_R"]:	
+				s.append("Following incubation of the plasma with heparinase, the thrombin time does not shorten, and remains prolonged by {:0.1f} seconds.".format(d["LTTHEP_P"]))
+			elif d["LTTHEP_R"] < d["LTTHEP_U"]:
+				s.append("Following incubation of the plasma with heparinase, the thrombin time shortens by {:0.1f} seconds, returning to within the normal range.".format(d["LTT_R"] - d["LTTHEP_R"]))
+				if d["heparin"]:
+					if str(d["PNP_SD"]) == "":
+						s.append("Confirmatory phase testing was not performed, due to the potential for false positive results that can occur from platelet factor 4 present in the platelet lysate reagent neutralizing the heparin present in this patient's plasma.")
+			else:				
+				s.append("Following incubation of the plasma with heparinase, the thrombin time shortens by {:0.1f} seconds.".format(d["LTT_R"] - d["LTTHEP_R"]))
+				if d["heparin"]:
+					if str(d["PNP_SD"]) == "":
+						s.append("Confirmatory phase testing was not performed, due to the potential for false positive results that can occur from platelet factor 4 present in the platelet lysate reagent neutralizing the heparin present in this patient's plasma.")
 	return " ".join(s) 
 
 # generates the second portion of output
@@ -88,6 +105,7 @@ def MiddleSection(testname, initR, initU, initP, mixR, mixU, mixP, corrR, percen
 		suffix = " ({:0.0f}%, upper limit of normal {:0.0f}%).".format(percentR*100,percentU*100)
 		if corrR > initR:			s.append(prefix + "there is no shortening of the clotting time.")
 		elif percentR >= percentU+0.005:	s.append(prefix + "there is a significant shortening of the clotting time" + suffix)
+		elif round(100*percentR) == round(100*percentU):	s.append(prefix + "the clotting time shortens and reaches to, but does not actually exceed, the 99th percentile upper limit of the normal reference interval" + suffix)
 	        elif abs(percentR - percentU) <0.005:   s.append(prefix + "the clotting time shortens and does come quite close to the 99th percentile upper limit of the normal reference interval" + suffix)
 		elif abs(percentR - percentU) < 0.015:	s.append(prefix + "the clotting time shortens and approaches, but does not exceed, the 99th percentile upper limit of the normal reference interval" + suffix)
 		elif percentR <= 0.01499:		s.append(prefix + "the clotting time shortens only minimally, but certainly does not approach anywhere close to the 99th percentile upper limit of the normal reference interval" + suffix)
@@ -135,6 +153,7 @@ def conclusionAlgorithm(d):
         Case = "POSITIVE"
         print "# Case is positive"
         s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
+
     if (sumConditions(C1,C2,C3)==0)  and Case=="":
         print "# Case is negative"
         s.append("This study does not provide evidence for the identification of a functional lupus anticoagulant.")
