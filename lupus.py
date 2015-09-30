@@ -61,7 +61,7 @@ def first(d):
 			else:
 				s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), the clotting time does not shorten in the presence of platelet lysate.")
 		elif d["PNP_SD"]>d["PNP_U"]:   s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
-		else:	s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is shortening of the clotting time, but does not exceed the significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
+		else:	s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), the clotting time does not approach the 99th percentile upper limit of the normal reference range.")
 		
 	if str(d["LTT_R"])!="":
 		if d["LTT_R"]<d["LTT_L"]:	s.append("The thrombin time is short at {:0.1f} seconds (lower limit of normal is {:0.1f} seconds), a finding suggestive of possibly increased fibrinogen.".format(d["LTT_R"],d["LTT_L"]))
