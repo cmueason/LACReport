@@ -59,8 +59,8 @@ def first(d):
 			if d["PNP_SD"]>d["PNP_U"]: 
 				s.append("An abnormality is also observed in the confirmatory phase of the aPTT-based system (platelet neutralization procedure) with the patient at {:0.1f} SD, and the upper limit of normal {:0.1f} SD.".format( d["PNP_SD"],d["PNP_U"]))
 			else:
-				s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), the clotting time does not shorten in the presence of platelet lysate.")
-		elif d["PNP_SD"]>d["PNP_U"]:   s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is significant shortening of the clotting time in the presence of platelet lysate ({:0.1f} SD, upper limit of normal {:0.1f} SD).".format( d["PNP_SD"],d["PNP_U"]))
+				s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), the clotting time does not approach the 99th percentile upper limit of the normal reference interval.")
+		elif d["PNP_SD"]>d["PNP_U"]:   s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), there is significant shortening of the clotting time in the presence of platelet lysate which exceeds the 99th percentile upper limit of the normal reference interval.")
 		else:	s.append("In the confirmatory phase of the aPTT-based system (platelet neutralization procedure), the clotting time does not approach the 99th percentile upper limit of the normal reference range.")
 		
 	if str(d["LTT_R"])!="":
@@ -156,7 +156,7 @@ def conclusionAlgorithm(d):
 
     if (sumConditions(C1,C2,C3)==0)  and Case=="":
         print "# Case is negative"
-        s.append("This study does not provide evidence for the identification of a functional lupus anticoagulant.")
+        s.append("The current study does not provide evidence of antiphospholipid syndrome by either functional lupus anticoagulant studies or by anti-cardiolipin or anti-beta-2 glycoprotein-1 antibody testing.")
         Case  = "NEGATIVE"
 
     # fondaparinux
