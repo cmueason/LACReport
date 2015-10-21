@@ -1,5 +1,4 @@
 import operator, os, xlrd, datetime, sys, re
-from enum import Enum
 execfile('global.py')
 execfile('process.py')
 
@@ -117,7 +116,12 @@ def MiddleSection(testname, initR, initU, initP, mixR, mixU, mixP, corrR, percen
 
 
 #############################################################################################################################
-AgResults = Enum('AgResults','NotDone Neg Close Pos')
+class AgResults:
+	NotDone = 1
+	Neg = 2
+	Close = 3
+	Pos = 4
+
 # this gets the results for IgG and IgM 
 def getAgResult(igvalue, cutoff, claimed):
 	if claimed:
