@@ -7,6 +7,21 @@ import re
 
 execfile('global.py')
 
+def validate(number):
+	if isinstance(number, (int, float)):
+		return number
+	elif number is None:
+		return -1
+	elif number == "":
+		return -1
+	else:
+		match = re.match('^([0-9.]+)',number)
+		if match:
+			return float(match.group(1))
+		else:
+			match = re.match('^<([0-9.]+)', number)
+			return float(match.group(1))
+
 # this file has a function that processes one file, and returns a hash with all the values
 def readFile(filename):
 	book = open_workbook(filename,on_demand=True)
@@ -23,7 +38,7 @@ def readFile(filename):
 	d["PT_INIT"] = sheet.cell_value(3, 5)
 	d["PT_MRN"] = sheet.cell_value(4, 5)
 	d["DATE"] = sheet.cell_value(5, 5)
-	d["LAPTT_R"] = sheet.cell_value(11, 1)
+	d["LAPTT_R"] = validate(sheet.cell_value(11, 1))
 	d["PTTMX_R"] = sheet.cell_value(14, 1)
 	d["LTT_R"] = sheet.cell_value(12, 1)
 	d["LTTHEP_R"] = sheet.cell_value(13, 1)
@@ -47,7 +62,7 @@ def readFile(filename):
 		d["PNP_SD"] = 0
 		d["PNP_R"]  = 0
 	
-	d["DRVVS_R"] = sheet.cell_value(25, 1)
+	d["DRVVS_R"] = validate(sheet.cell_value(25, 1))
 	d["DRVVMX_R"] = sheet.cell_value(26, 1)
 	d["DRVVC_R"] = sheet.cell_value(27, 1)
 	d["PCTCO_R"] = sheet.cell_value(28, 1)
@@ -57,7 +72,7 @@ def readFile(filename):
 	d["DRVVS_P"] = sheet.cell_value(25, 4)
 	d["DRVVMX_P"] = sheet.cell_value(26, 4)
 	d["PCTCO_P"] = sheet.cell_value(28, 4)
-	d["DPTS_R"] = sheet.cell_value(33, 1)
+	d["DPTS_R"] = validate(sheet.cell_value(33, 1))
 	d["DPTMX_R"] = sheet.cell_value(34, 1)
 	d["DPTC_R"] = sheet.cell_value(35, 1)
 	d["DPTCOR_R"] = sheet.cell_value(36, 1)
@@ -67,6 +82,28 @@ def readFile(filename):
 	d["DPTS_P"] = sheet.cell_value(33, 4)
 	d["DPTMX_P"] = sheet.cell_value(34, 4)
 	d["DPTCOR_P"] = sheet.cell_value(36, 4)
+
+
+
+	d["AG_1_R"] = validate(sheet.cell_value(41,1)) 
+	d["AG_2_R"] = validate(sheet.cell_value(42,1)) 
+	d["AG_3_R"] = validate(sheet.cell_value(43,1)) 
+	d["AG_4_R"] = validate(sheet.cell_value(44,1)) 
+	d["AG_5_R"] = validate(sheet.cell_value(48,1)) 
+	d["AG_6_R"] = validate(sheet.cell_value(49,1)) 
+	d["AG_7_R"] = validate(sheet.cell_value(50,1)) 
+	d["AG_8_R"] = validate(sheet.cell_value(51,1)) 
+
+	d["AG_1_U"] = validate(sheet.cell_value(41,3)) 
+	d["AG_2_U"] = validate(sheet.cell_value(42,3)) 
+	d["AG_3_U"] = validate(sheet.cell_value(43,3)) 
+	d["AG_4_U"] = validate(sheet.cell_value(44,3)) 
+	d["AG_5_U"] = validate(sheet.cell_value(48,3)) 
+	d["AG_6_U"] = validate(sheet.cell_value(49,3)) 
+	d["AG_7_U"] = validate(sheet.cell_value(50,3)) 
+	d["AG_8_U"] = validate(sheet.cell_value(51,3)) 
+
+	
 	return d
 
 def writeFile(txt, filename):

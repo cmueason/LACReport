@@ -1,4 +1,5 @@
 import operator, os, xlrd, datetime, sys, re
+from enum import Enum
 execfile('global.py')
 execfile('process.py')
 
@@ -114,6 +115,97 @@ def MiddleSection(testname, initR, initU, initP, mixR, mixU, mixP, corrR, percen
 	
 	return " ".join(s)
 
+
+#############################################################################################################################
+AgResults = Enum('AgResults','NotDone Neg Close Pos')
+# this gets the results for IgG and IgM 
+def getAgResult(igvalue, cutoff, claimed):
+	if claimed:
+		if igvalue == -1: 	return AgResults.NotDone
+		elif igvalue < .75*cutoff:	return AgResults.Neg
+		elif igvalue <cutoff:	return AgResults.Close
+		else:	return AgResults.Pos
+	else:
+		if igvalue == -1: 	return AgResults.NotDone
+		elif igvalue < cutoff: 	return AgResults.Neg
+		else:	return AgResults.Pos
+
+def getAgResultIGGIGM(ig1, ig2, cutoff1, cutoff2, igtype1, igtype2, texttype1, texttype2, claimed=True):
+	s = []
+	result1 = getAgResult(ig1, cutoff1, claimed)
+	result2 = getAgResult(ig2, cutoff2, claimed)
+
+	if igtype1 == igtype2:
+		if (result1 == AgResults.Neg) and (result2 == AgResults.Neg): 
+			s.append("Solid phase testing is negative for {!s} anti-{!s} and anti-{!s}".format(igtype1,texttype1, texttype2) + " antibodies.")
+		if (result1 == AgResults.Pos) and (result2 == AgResults.Pos):
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}. Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}.".format(igtype1, texttype1, ig1, igtype2, texttype2 , ig2)) 
+		if (result1 == AgResults.Neg) and (result2 == AgResults.Pos): 
+			s.append("Solid phase testing is negative for {!s} anti-{!s}".format(igtype1, texttype1) + " antibodies.")		
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}.".format(igtype2, texttype2, ig2)) 
+		if (result1 == AgResults.Pos) and (result2 == AgResults.Neg): 
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}".format(igtype1, texttype1, ig1)) 
+			s.append("Solid phase testing is negative for {!s} anti-".format(igtype2)  + texttype2 + " antibodies.")
+	elif claimed:
+		if (result1 == AgResults.Neg) and (result2 == AgResults.Neg): 
+			s.append("Solid phase testing is negative for {!s} and {!s} anti-".format(igtype1,igtype2) + texttype1 + " antibodies.")
+		if (result1 == AgResults.Close) and (result2 == AgResults.Close):
+			s.append("However, we should note that the levels for the {!s} and {!s} isotype against ".format(igtype1,igtype2) + texttype1 + " do nearly reach the 99th percentile {:0.0f} CU upper limit of the normal reference interval.".format(cutoff1))
+		if (result1 == AgResults.Pos) and (result2 == AgResults.Pos):
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f} (99th percentile upper limit of normal {:0.0f} CU). Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f} (99th percentile upper limit of normal {:0.0f} CU).".format(igtype1, texttype1, ig1, cutoff1, igtype2, texttype2 , ig2, cutoff2)) 
+		if (result1 == AgResults.Neg) and (result2 == AgResults.Close): 
+			s.append("Solid phase testing is negative for {!s} anti-".format(igtype1) + texttype1 + " antibodies.")
+			s.append("However, we should note that the level for the {!s} isotype against ".format(igtype2) + texttype2 + " does nearly reach the 99th percentile {:0.0f} CU upper limit of the normal reference interval.")
+		if (result1 == AgResults.Neg) and (result2 == AgResults.Pos): 
+			s.append("Solid phase testing is negative for {!s} anti-".format(igtype1)  + texttype1 + " antibodies.")		
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f} (99th percentile upper limit of normal {:0.0f} CU). ".format(igtype2,texttype2, ig2, cutoff2)) 
+		if (result1 == AgResults.Close) and (result2 == AgResults.Neg): 
+			s.append("Solid phase testing is negative for {!s} anti-".format(igtype1)  + texttype1 + " antibodies.")
+			s.append("However, we should note that the level for the {!s} isotype against ".format(igtype2) + texttype2 + " does nearly reach the 99th percentile {:0.0f} CU upper limit of the normal reference interval.".format(cutoff1))	
+		if (result1 == AgResults.Close) and (result2 == AgResults.Pos): 
+			s.append("However, we should note that the level for the {!s} isotype against ".format(igtype1)  + texttype1 + " does nearly reach the 99th percentile {:0.0f} CU upper limit of the normal reference interval.".format(cutoff1))
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f} (99th percentile upper limit of normal {:0.0f} CU).".format(igtype2, texttype2, ig2, cutoff2)) 
+		if (result1 == AgResults.Pos) and (result2 == AgResults.Neg): 
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f} (99th percentile upper limit of normal {:0.0f} CU).".format(igtype1, texttype1, ig1, cutoff1)) 
+			s.append("Solid phase testing is negative for {!s} anti-".format(igtype2)  + texttype2 + " antibodies.")
+		if (result1 == AgResults.Pos) and (result2 == AgResults.Close): 
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f} (99th percentile upper limit of normal {:0.0f} CU).".format(igtype1, texttype1, ig1, cutoff1)) 
+			s.append("However, we should note that the level for the {!s} isotype against ".format(igtype2)  + texttype2 + " does nearly reach the 99th percentile {:0.0f} CU upper limit of the normal reference interval.".format(cutoff1))
+	else:
+		if (result1 == AgResults.Neg) and (result2 == AgResults.Neg): 
+			s.append("Solid phase testing is negative for {!s} and {!s} anti-".format(igtype1,igtype2) + texttype1 + " antibodies.")
+		if (result1 == AgResults.Pos) and (result2 == AgResults.Pos):
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f} (99th percentile upper limit of normal {:0.0f} CU). Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}.".format(igtype1, texttype1, ig1, cutoff1, igtype2, texttype2 , ig2)) 
+		if (result1 == AgResults.Neg) and (result2 == AgResults.Pos): 
+			s.append("Solid phase testing is negative for {!s} anti-".format(igtype1)  + texttype1 + " antibodies.")		
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}. ".format(igtype2,texttype2, ig2)) 
+		if (result1 == AgResults.Pos) and (result2 == AgResults.Neg): 
+			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}.".format(igtype1, texttype1, ig1)) 
+			s.append("Solid phase testing is negative for {!s} anti-".format(igtype2)  + texttype2 + " antibodies.")
+	
+
+	return " ".join(s)
+
+
+def AgSection(d):
+	P1 = getAgResultIGGIGM(d["AG_1_R"], d["AG_2_R"], d["AG_1_U"], d["AG_2_U"], "IgG", "IgM", "cardiolipin", "cardiolipin", True)
+	P2 = getAgResultIGGIGM(d["AG_3_R"], d["AG_4_R"], d["AG_3_U"], d["AG_4_U"], "IgG", "IgM", "beta-2 glycoprotein-1", "beta-2 glycoprotein-1", True)
+	P3 = getAgResultIGGIGM(d["AG_5_R"], d["AG_6_R"], d["AG_5_U"], d["AG_6_U"], "IgA", "IgA", "cardiolipin", "beta-2 glycoprotein-1", False)
+	P4 = getAgResultIGGIGM(d["AG_7_R"], d["AG_8_R"], d["AG_7_U"], d["AG_8_U"], "IgG", "IgM", "phosphatidylserine/prothrombin complexes", "phosphatidylserine/prothrombin complexes", False)	
+
+	#getAgResultIGGIGM(ig1, ig2, cutoff1, cutoff2, igtype1, igtype2, texttype1, texttype2, claimed=True):
+
+	s = []
+	if P1 != "": 	s.append(P1)
+	if P2 != "": 	s.append(P2)
+	if P3 != "": 	s.append(P3)
+	if P4 != "": 	s.append(P4)
+
+	return " ".join(s) 
+
+
+#############################################################################################################################
+
 def header(d,filename):
 	try:
 		s = []
@@ -206,17 +298,23 @@ def footer(attending):
 def report(d,filename, attending):
 	try:		S1 = first(d)
 	except:		S1 = "An error occurred while generating the APTT section."
+
 	try:		DRVVTSection = MiddleSection("DRVVT-based", d["DRVVS_R"], d["DRVVS_U"], d["DRVVS_P"], d["DRVVMX_R"],d["DRVVMX_U"],d["DRVVMX_P"], d["DRVVC_R"], d["PCTCO_R"], d["PCTCO_U"])
 	except:		DRVVTSection = "An error occurred while generating the DRVVT section."
+
 	try:		DPTSection = MiddleSection("DPT-based", d["DPTS_R"], d["DPTS_U"], d["DPTS_P"], d["DPTMX_R"],d["DPTMX_U"],d["DPTMX_P"], d["DPTC_R"],d["DPTCOR_R"], d["DPTCOR_U"])
 	except:		DPTSection = "An error occurred while generating the DPT section."
+
+	try:		AgSectionParagraph = AgSection(d)
+	except:		AgSectionParagraph = "An error occurred while generating the Antigen section."
+
         try:		Conclusion = conclusion(d, filename)
 	except Exception as inst: 	
 		Conclusion = "An error occurred while generating the conclusion."
 		print type(inst)
 		print inst.args
 		print inst
-	return header(d, filename) + "\n\n" + S1 + "\n\n" + DRVVTSection + "\n\n" + DPTSection + "\n\n" + Conclusion + "\n\n\n\n\n" + footer(attending)
+	return header(d, filename) + "\n\n" + S1 + "\n\n" + DRVVTSection + "\n\n" + DPTSection + "\n\n" + AgSectionParagraph + "\n\n" + Conclusion + "\n\n\n\n\n" + footer(attending)
 
 def processXLS(filename, attending):
 	print("===============\n# Processing "+filename+"...")
