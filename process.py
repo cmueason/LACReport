@@ -103,6 +103,7 @@ def readFile(filename):
 	d["AG_7_U"] = validate(sheet.cell_value(50,3)) 
 	d["AG_8_U"] = validate(sheet.cell_value(51,3)) 
 
+	print d
 	
 	return d
 

@@ -121,6 +121,8 @@ class AgResults:
 	Neg = 2
 	Close = 3
 	Pos = 4
+	DoubleNeg = 5
+	OtherResult = 6
 
 # this gets the results for IgG and IgM 
 def getAgResult(igvalue, cutoff, claimed):
@@ -134,14 +136,22 @@ def getAgResult(igvalue, cutoff, claimed):
 		elif igvalue < cutoff: 	return AgResults.Neg
 		else:	return AgResults.Pos
 
-def getAgResultIGGIGM(ig1, ig2, cutoff1, cutoff2, igtype1, igtype2, texttype1, texttype2, claimed=True):
+def getAgResultIGGIGM(ig1, ig2, cutoff1, cutoff2, igtype1, igtype2, texttype1, texttype2, prevResult, claimed=True):
 	s = []
 	result1 = getAgResult(ig1, cutoff1, claimed)
 	result2 = getAgResult(ig2, cutoff2, claimed)
 
+	if prevResult == AgResults.DoubleNeg:
+		modifier = "also "
+	else:
+		modifier = ""
+
+	currentResult = AgResults.OtherResult
+
 	if igtype1 == igtype2:
 		if (result1 == AgResults.Neg) and (result2 == AgResults.Neg): 
-			s.append("Solid phase testing is negative for {!s} anti-{!s} and anti-{!s}".format(igtype1,texttype1, texttype2) + " antibodies.")
+			s.append("Solid phase testing is "+modifier+"negative for {!s} anti-{!s} and anti-{!s}".format(igtype1,texttype1, texttype2) + " antibodies.")
+			currentResult = AgResults.DoubleNeg
 		if (result1 == AgResults.Pos) and (result2 == AgResults.Pos):
 			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}. Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}.".format(igtype1, texttype1, ig1, igtype2, texttype2 , ig2)) 
 		if (result1 == AgResults.Neg) and (result2 == AgResults.Pos): 
@@ -152,7 +162,8 @@ def getAgResultIGGIGM(ig1, ig2, cutoff1, cutoff2, igtype1, igtype2, texttype1, t
 			s.append("Solid phase testing is negative for {!s} anti-".format(igtype2)  + texttype2 + " antibodies.")
 	elif claimed:
 		if (result1 == AgResults.Neg) and (result2 == AgResults.Neg): 
-			s.append("Solid phase testing is negative for {!s} and {!s} anti-".format(igtype1,igtype2) + texttype1 + " antibodies.")
+			s.append("Solid phase testing is "+modifier+"negative for {!s} and {!s} anti-".format(igtype1,igtype2) + texttype1 + " antibodies.")
+			currentResult = AgResults.DoubleNeg
 		if (result1 == AgResults.Close) and (result2 == AgResults.Close):
 			s.append("However, we should note that the levels for the {!s} and {!s} isotype against ".format(igtype1,igtype2) + texttype1 + " do nearly reach the 99th percentile {:0.0f} CU upper limit of the normal reference interval.".format(cutoff1))
 		if (result1 == AgResults.Pos) and (result2 == AgResults.Pos):
@@ -177,7 +188,8 @@ def getAgResultIGGIGM(ig1, ig2, cutoff1, cutoff2, igtype1, igtype2, texttype1, t
 			s.append("However, we should note that the level for the {!s} isotype against ".format(igtype2)  + texttype2 + " does nearly reach the 99th percentile {:0.0f} CU upper limit of the normal reference interval.".format(cutoff1))
 	else:
 		if (result1 == AgResults.Neg) and (result2 == AgResults.Neg): 
-			s.append("Solid phase testing is negative for {!s} and {!s} anti-".format(igtype1,igtype2) + texttype1 + " antibodies.")
+			s.append("Solid phase testing is "+modifier+"negative for {!s} and {!s} anti-".format(igtype1,igtype2) + texttype1 + " antibodies.")
+			currentResult = AgResults.DoubleNeg
 		if (result1 == AgResults.Pos) and (result2 == AgResults.Pos):
 			s.append("Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f} (99th percentile upper limit of normal {:0.0f} CU). Solid phase testing for {!s} anti-{!s} antibodies is elevated at {:0.1f}.".format(igtype1, texttype1, ig1, cutoff1, igtype2, texttype2 , ig2)) 
 		if (result1 == AgResults.Neg) and (result2 == AgResults.Pos): 
@@ -188,14 +200,14 @@ def getAgResultIGGIGM(ig1, ig2, cutoff1, cutoff2, igtype1, igtype2, texttype1, t
 			s.append("Solid phase testing is negative for {!s} anti-".format(igtype2)  + texttype2 + " antibodies.")
 	
 
-	return " ".join(s)
+	return (" ".join(s),currentResult)
 
 
 def AgSection(d):
-	P1 = getAgResultIGGIGM(d["AG_1_R"], d["AG_2_R"], d["AG_1_U"], d["AG_2_U"], "IgG", "IgM", "cardiolipin", "cardiolipin", True)
-	P2 = getAgResultIGGIGM(d["AG_3_R"], d["AG_4_R"], d["AG_3_U"], d["AG_4_U"], "IgG", "IgM", "beta-2 glycoprotein-1", "beta-2 glycoprotein-1", True)
-	P3 = getAgResultIGGIGM(d["AG_5_R"], d["AG_6_R"], d["AG_5_U"], d["AG_6_U"], "IgA", "IgA", "cardiolipin", "beta-2 glycoprotein-1", False)
-	P4 = getAgResultIGGIGM(d["AG_7_R"], d["AG_8_R"], d["AG_7_U"], d["AG_8_U"], "IgG", "IgM", "phosphatidylserine/prothrombin complexes", "phosphatidylserine/prothrombin complexes", False)	
+	(P1,R1) = getAgResultIGGIGM(d["AG_1_R"], d["AG_2_R"], d["AG_1_U"], d["AG_2_U"], "IgG", "IgM", "cardiolipin", "cardiolipin", AgResults.OtherResult, True)
+	(P2,R2) = getAgResultIGGIGM(d["AG_3_R"], d["AG_4_R"], d["AG_3_U"], d["AG_4_U"], "IgG", "IgM", "beta-2 glycoprotein-1", "beta-2 glycoprotein-1", R1, True)
+	(P3,R3) = getAgResultIGGIGM(d["AG_5_R"], d["AG_6_R"], d["AG_5_U"], d["AG_6_U"], "IgA", "IgA", "cardiolipin", "beta-2 glycoprotein-1", R2, False)
+	(P4,R4) = getAgResultIGGIGM(d["AG_7_R"], d["AG_8_R"], d["AG_7_U"], d["AG_8_U"], "IgG", "IgM", "phosphatidylserine/prothrombin complexes", "phosphatidylserine/prothrombin complexes", R3, False)	
 
 	#getAgResultIGGIGM(ig1, ig2, cutoff1, cutoff2, igtype1, igtype2, texttype1, texttype2, claimed=True):
 
@@ -244,11 +256,18 @@ def conclusionAlgorithm(d):
     def sumConditions(C1, C2, C3):
 	return reduce(operator.add, map(lambda x: 1 if x else 0, [C1,C2,C3]), 0)
 
+    if (d["LAPTT_R"] == -1) and (d["DRVVS_R"]==-1) and (d["DPTS_R"]==-1):
+	# functional was not done, only antigenic
+	# assume negative 
+	Case = "Antigen NEGATIVE"
+	s.append("The current study does not provide evidence of antiphospholipid syndrome by either anti-cardiolipin or anti-beta-2 glycoprotein-1 antibody testing.")
+	
+
     (C1,C2,C3) = (round(LAPTT*10) > round(d["PNP_U"]*10), round(DRVVT*100) > round(d["PCTCO_U"]*100), round(DPT*100) > round(d["DPTCOR_U"]*100))
     if (sumConditions(C1,C2,C3)>=1)  and (Case==""):
         Case = "POSITIVE"
         print "# Case is positive"
-        s.append("The current testing, notably in " + helper(C1,C2,C3) + ", provides evidence supporting the presence of a functional lupus anticoagulant. Confirmatory repeat testing in 12 weeks is recommended. ")
+        s.append("The current testing, notably in " + helper(C1,C2,C3) + ", does provide some evidence for the presence of antiphospholipid syndrome. No additional evidence is contributed by functional lupus anticoagulant testing in the other testing systems employed in this study, nor by solid phase testing for abnormally increased levels of IgG or IgM antibodies directed against cardiolipin or beta-2 glycoprotein-1.  Confirmatory repeat functional lupus anticoagulant testing in 12 weeks is recommended.  Additionally, consideration may be given to ordering an LA/APS Level 2 Antigenic Package (EPIC code LAAPS2), which could be ordered as an add-on to the present study.  This package includes antigenic testing for IgA antibodies directed against beta-2 glycoprotein-1 and against cardiolipin. It additionally includes antigenic testing for IgG and IgM antibodies directed against phosphatidylserine/prothrombin complexes.")
 
     if (sumConditions(C1,C2,C3)==0)  and Case=="":
         print "# Case is negative"
@@ -283,7 +302,7 @@ def conclusion(d, filename):
 			if len(concl)>0:
 				s.append("\n\nPrevious conclusion (" + i + "): " + str(concl))
 	except Exception as inst: 
-		s.append("An error occurred while tracting the conclusion from a previous report.")
+		s.append("An error occurred while extracting the conclusion from a previous report.")
 		print type(inst)
 		print inst.args
 		print inst
