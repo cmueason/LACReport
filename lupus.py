@@ -314,7 +314,7 @@ def footer(attending):
 	formatdate = today.strftime('%B ')+str(today.day)+", "+str(today.year)
 	if attending == "miller": 	return "Jonathan Miller, MD, PhD, Director of Coagulation Laboratory\t\t" + formatdate
 	elif attending == "treml":	return "Angela Treml, MD, Attending, Coagulation Laboratory\t\t" + formatdate
-	elif attending == "wool":	return "Geoffrey Wool, MD, PhD, Attending, Coagulation Laboratory\t\t" + formatdate
+	elif attending == "wool":	return "Geoffrey Wool, MD, PhD, Associate Medical Director, Coagulation Laboratory\t\t" + formatdate
 	elif attending == "sandeep":	return "Sandeep Gurbuxani, MD, Attending, Coagulation Laboratory\t\t" + formatdate
 	else:				return "Jonathan Miller, MD, PhD, Director of Coagulation Laboratory\t\t" + formatdate
 
