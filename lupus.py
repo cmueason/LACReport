@@ -345,7 +345,7 @@ def processXLS(filename, attending):
 		myhash = readFile(filename)
 		s = report(myhash,filename, attending)
 		print "#" + s
-		writeFile(s,os.path.join(OUTPUTDIR, os.path.basename(filename.replace(".xls", ".docx"))))
+		writeFile(s,os.path.join(OUTPUTDIR, os.path.basename(filename.replace(".xls", ".doc"))))
 	except:
 		pass
 
